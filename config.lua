@@ -7,7 +7,7 @@
 
 Config = {}
 
-Config.Locale = 'de'
+Config.Locale = 'en'
 
 Config.Types = {"drive", "drive_bike", "drive_truck", "weapon"}
 
