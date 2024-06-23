@@ -10,7 +10,10 @@ https://github.com/ScubeScripts/sc_licensemanager
 ## Requirements
 
 > [ESX-Legacy](https://github.com/esx-framework/esx-legacy)
+
 > [ox_lib](https://github.com/overextended/ox_lib)
+
+> [pefcl](https://github.com/project-error/pefcl)
 
 ## Installation
 Clone or download this repository
