@@ -4,10 +4,6 @@ Today I would like to introduce you to my new script sc_licensemanager, with thi
 
 ![Screenshot 2024-06-23 172610](https://github.com/ScubeScripts/sc_licensemanager/assets/104854776/ae0d3b71-0248-4e82-9134-2956f8adb516)
 
-# » Download sc_licensemanager
-
-https://github.com/ScubeScripts/sc_licensemanager
-
 
 ## Requirements
 
