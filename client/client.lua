@@ -109,6 +109,10 @@ AddEventHandler('sc_lc:showLicenses', function(playerName, licenses)
     })
 end)
 
+RegisterNetEvent('sc_lm:sendTax')
+AddEventHandler('sc_lm:sendTax', function(source, type, amount)
+  TriggerServerEvent('esx_billing:sendBill', source, 'society_police', type, amount)
+end)
 
 --Add License
 

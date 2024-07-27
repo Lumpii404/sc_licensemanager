@@ -5,7 +5,7 @@ AddEventHandler('sc_lc:checkJobAndOpenMenu', function()
     local _source = source
     local xPlayer = ESX.GetPlayerFromId(_source)
 
-    if xPlayer and xPlayer.job.name == 'police' and xPlayer.job.grade >= 10 then
+    if xPlayer and xPlayer.job.name == Config.Job and xPlayer.job.grade >= Config.Grade then
         TriggerClientEvent('sc_lc:open', source)
     else
         TriggerClientEvent('esx:showNotification', _source, Translation[Config.Locale]['no_perms'])
@@ -91,6 +91,7 @@ AddEventHandler('sc_lc:addlicense', function(playerID, licenseType, price)
             ['@type'] = licenseType,
             ['@owner'] = playerIdentifier
         })
+
         if price == 0 then
             TriggerClientEvent('ox_lib:notify', playerID, {
                 id = 'invoice_3',
@@ -101,28 +102,45 @@ AddEventHandler('sc_lc:addlicense', function(playerID, licenseType, price)
                 icon = 'file-circle-plus',
                 iconColor = '#12b886'
             })
+        else
+            if Config.UsePefcl then
+                exports.pefcl:createInvoice(playerID, {
+                    to = xPlayer.getName(),
+                    toIdentifier = playerIdentifier,
+                    from = jobName,
+                    fromIdentifier = jobName,
+                    amount = price,
+                    message = Translation[Config.Locale]['pur_li'] .. licenseType .. Translation[Config.Locale]['lic'],
+                    receiverAccountIdentifier = jobName
+                })
+                TriggerClientEvent('ox_lib:notify', playerID, {
+                    id = 'invoice_1',
+                    title = Translation[Config.Locale]['rec_inv'],
+                    description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
+                    duration = 5000,
+                    position = 'top-right',
+                    icon = 'receipt',
+                    iconColor = '#2490DA'
+                })
+            else
+                TriggerClientEvent('sc_lm:sendTax', xPlayer.source, playerID, 'LSPD license office', price) 
+                TriggerClientEvent('ox_lib:notify', playerID, {
+                    id = 'invoice_1',
+                    title = Translation[Config.Locale]['rec_inv'],
+                    description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
+                    duration = 5000,
+                    position = 'top-right',
+                    icon = 'receipt',
+                    iconColor = '#2490DA'
+                })
+            end
         end
-
-        if price > 0 then
-            exports.pefcl:createInvoice(playerID, {
-                to = xPlayer.getName(),
-                toIdentifier = playerIdentifier,
-                from = jobName,
-                fromIdentifier = jobName,
-                amount = price,
-                message = Translation[Config.Locale]['pur_li'] .. licenseType .. Translation[Config.Locale]['lic'],
-                receiverAccountIdentifier = jobName
-            })
-            TriggerClientEvent('ox_lib:notify', playerID, {
-                id = 'invoice_1',
-                title = Translation[Config.Locale]['rec_inv'],
-                description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
-                duration = 5000,
-                position = 'top-right',
-                icon = 'receipt',
-                iconColor = '#2490DA'
-            })
-        end
+    else
+        TriggerClientEvent('ox_lib:notify', source, {
+            title = Translation[Config.Locale]['error'],
+            description = Translation[Config.Locale]['no_player_found'],
+            type = 'error'
+        })
     end
 end)
 

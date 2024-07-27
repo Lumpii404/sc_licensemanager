@@ -9,7 +9,13 @@ Config = {}
 
 Config.Locale = 'en'
 
+Config.Job = 'police'
+
+Config.Grade = 10
+
 Config.Types = {"drive", "drive_bike", "drive_truck", "weapon"}
+
+Config.UsePefcl = true --https://forum.cfx.re/t/free-pefcl-a-banking-resource-standalone-esx-qbcore/4906535
 
 Config.Coords = {
     443.04, -980.72, 30.68,
