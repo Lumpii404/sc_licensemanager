@@ -39,7 +39,7 @@ AddEventHandler('sc_lc:checklicense', function(playerID)
         end
 
         local playerName = xPlayer.getName()
-        TriggerClientEvent('sc_lc:showLicenses', src, playerName, licenseNames)
+        TriggerClientEvent('sc_lc:showLicenses', src, playerName, playerID, licenseNames)
     else
         TriggerClientEvent('sc_lc:showLicenses', src, Translation[Config.Locale]['unk'], {Translation[Config.Locale]['no_id']})
     end
@@ -75,70 +75,63 @@ AddEventHandler('sc_lc:fetchLicenses', function(playerID)
 end)
 
 RegisterServerEvent('sc_lc:addlicense')
-AddEventHandler('sc_lc:addlicense', function(playerID, licenseType, price)
-    TriggerClientEvent('ox_lib:notify', source, {
-        title = Translation[Config.Locale]['add_license'],
-        description = Translation[Config.Locale]['add_li1'] .. licenseType .. Translation[Config.Locale]['add_li2'],
-        type = 'success'
-    })
+AddEventHandler('sc_lc:addlicense', function(playerID, licenseType, price, paymentMethod)
     local xPlayer = ESX.GetPlayerFromId(playerID)
+    local src = source
 
     if xPlayer then
         local playerIdentifier = xPlayer.identifier
         local jobName = xPlayer.job.name
+
+        if paymentMethod == 'cash' then
+            if xPlayer.getMoney() >= price then
+                xPlayer.removeMoney(price)
+            else
+                TriggerClientEvent('ox_lib:notify', playerID, {
+                    title = Translation[Config.Locale]['menu_name'],
+                    description = Translation[Config.Locale]['no_mo_money'],
+                    type = 'error'
+                })
+                return
+            end
+        elseif paymentMethod == 'bank' then
+            local bankAccount = xPlayer.getAccount('bank')
+            if bankAccount.money >= price then
+                xPlayer.removeAccountMoney('bank', price, Config.BName)
+            else
+                TriggerClientEvent('ox_lib:notify', playerID, {
+                    title = Translation[Config.Locale]['menu_name'],
+                    description = Translation[Config.Locale]['no_ba_money'],
+                    type = 'error'
+                })
+                return
+            end
+        end
 
         MySQL.Sync.execute("INSERT INTO user_licenses (type, owner) VALUES (@type, @owner)", {
             ['@type'] = licenseType,
             ['@owner'] = playerIdentifier
         })
 
-        if price == 0 then
-            TriggerClientEvent('ox_lib:notify', playerID, {
-                id = 'invoice_3',
-                title = Translation[Config.Locale]['rev_li'],
-                description = Translation[Config.Locale]['rev_li1'] .. licenseType,
-                duration = 5000,
-                position = 'top-right',
-                icon = 'file-circle-plus',
-                iconColor = '#12b886'
-            })
-        else
-            if Config.UsePefcl then
-                exports.pefcl:createInvoice(playerID, {
-                    to = xPlayer.getName(),
-                    toIdentifier = playerIdentifier,
-                    from = jobName,
-                    fromIdentifier = jobName,
-                    amount = price,
-                    message = Translation[Config.Locale]['pur_li'] .. licenseType .. Translation[Config.Locale]['lic'],
-                    receiverAccountIdentifier = jobName
-                })
-                TriggerClientEvent('ox_lib:notify', playerID, {
-                    id = 'invoice_1',
-                    title = Translation[Config.Locale]['rec_inv'],
-                    description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
-                    duration = 5000,
-                    position = 'top-right',
-                    icon = 'receipt',
-                    iconColor = '#2490DA'
-                })
-            else
-                TriggerClientEvent('sc_lm:sendTax', xPlayer.source, playerID, 'LSPD license office', price) 
-                TriggerClientEvent('ox_lib:notify', playerID, {
-                    id = 'invoice_1',
-                    title = Translation[Config.Locale]['rec_inv'],
-                    description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
-                    duration = 5000,
-                    position = 'top-right',
-                    icon = 'receipt',
-                    iconColor = '#2490DA'
-                })
-            end
-        end
+        TriggerClientEvent('ox_lib:notify', playerID, {
+            id = 'invoice_1',
+            title = Translation[Config.Locale]['pay_liz'],
+            description = Translation[Config.Locale]['pur_1'] .. licenseType .. Translation[Config.Locale]['pur_2'] .. price .. Translation[Config.Locale]['money'],
+            duration = 5000,
+            position = 'top-right',
+            icon = 'file-circle-plus',
+            iconColor = '#12b886'
+        })
+
+        TriggerClientEvent('ox_lib:notify', src, {
+            title = Translation[Config.Locale]['add_license'],
+            description = Translation[Config.Locale]['add_li1'] .. licenseType .. Translation[Config.Locale]['add_li2'],
+            type = 'success'
+        })
     else
-        TriggerClientEvent('ox_lib:notify', source, {
-            title = Translation[Config.Locale]['error'],
-            description = Translation[Config.Locale]['no_player_found'],
+        TriggerClientEvent('ox_lib:notify', playerID, {
+            title = Translation[Config.Locale]['menu_name'],
+            description = Translation[Config.Locale]['no_id'],
             type = 'error'
         })
     end
@@ -190,3 +183,13 @@ AddEventHandler('sc_lc:removelicense', function(playerID, license)
         iconColor = '#e06666'
     })
 end)
+
+ESX.RegisterServerCallback('sc_lc:getJob', function(source, cb)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        cb(xPlayer.job.name)
+    else
+        cb(nil)
+    end
+end)
+

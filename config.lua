@@ -7,25 +7,26 @@
 
 Config = {}
 
-Config.Locale = 'en'
+Config.Locale = 'en' -- de, es, fr and en
 
-Config.Job = 'police'
+Config.Job = 'police' -- This job sees the marker and can open the menu
 
-Config.Grade = 10
+Config.Grade = 4 --Everyone with or above this rank can open the menu
 
-Config.Types = {"drive", "drive_bike", "drive_truck", "weapon"}
+Config.BName = 'City of LosSantos' -- It's in the bank statement
 
-Config.UsePefcl = true --https://forum.cfx.re/t/free-pefcl-a-banking-resource-standalone-esx-qbcore/4906535
+Config.Types = {"drive", "drive_bike", "drive_truck", "weapon"} -- All licenses that your server has, you can add new ones
 
 Config.Coords = {
-    443.04, -980.72, 30.68,
-    463.48, -984.88, 30.68
+    440.32, -978.88, 30.68, --LSPD MRPD
+    -- You can add even more
 }
 
 Translation = {
     ['en'] = {
-        ['open_menu'] = '[E] - Open Menu',
+        ['open_menu'] = 'Open Licensemanager - E',
         ['menu_title'] = 'LSPD Licensecheck',
+        ['menu_error'] = 'Error',
         ['menu_check'] = 'Check license',
         ['menu_add'] = 'Add license',
         ['menu_remove'] = 'Remove license',
@@ -46,10 +47,12 @@ Translation = {
         ['rev_li1'] = "You have received the license ",
         ['pur_li'] = "Purchase of ",
         ['lic'] = " license",
-        ['rec_inv'] = 'Receive invoice',
+        ['pay_liz'] = 'License purchased',
         ['pur_1'] = "You have purchased a ",
         ['pur_2'] = " license for ",
         ['money'] = '$',
+        ['no_ba_money'] = 'You do not have enough money in your bank account to purchase this license.',
+        ['no_mo_money'] = 'You do not have enough cash to purchase this license.',
         ['rem_li'] = 'License removed',
         ['rem_li1'] = 'You have the license ',
         ['rem_li2'] = ' removed.' ,
@@ -57,7 +60,7 @@ Translation = {
         ['rem_li4'] = " was taken from you."
     },
     ['de'] = {
-        ['open_menu'] = '[E] - Menü öffnen',
+        ['open_menu'] = 'Menü öffnen - E',
         ['menu_title'] = 'LSPD Lizenzprüfung',
         ['menu_check'] = 'Lizenz prüfen',
         ['menu_add'] = 'Lizenz hinzufügen',
@@ -79,7 +82,7 @@ Translation = {
         ['rev_li1'] = 'Du hast die Lizenz ',
         ['pur_li'] = 'Kauf von ',
         ['lic'] = ' Lizenz',
-        ['rec_inv'] = 'Rechnung erhalten',
+        ['pay_liz'] = 'Lizenz gekauft',
         ['pur_1'] = 'Du hast eine ',
         ['pur_2'] = ' Lizenz für ',
         ['money'] = '€',
@@ -90,7 +93,7 @@ Translation = {
         ['rem_li4'] = ' wurde dir entzogen.'
     },
     ['es'] = {
-        ['open_menu'] = '[E] - Abrir menú',
+        ['open_menu'] = 'Abrir menú - E',
         ['menu_title'] = 'LSPD Verificación de licencia',
         ['menu_check'] = 'Verificar licencia',
         ['menu_add'] = 'Añadir licencia',
@@ -112,7 +115,7 @@ Translation = {
         ['rev_li1'] = 'Has recibido la licencia ',
         ['pur_li'] = 'Compra de ',
         ['lic'] = ' licencia',
-        ['rec_inv'] = 'Recibir factura',
+        ['pay_liz'] = 'Licencia adquirida',
         ['pur_1'] = 'Has comprado una ',
         ['pur_2'] = ' licencia por ',
         ['money'] = '$',
@@ -123,7 +126,7 @@ Translation = {
         ['rem_li4'] = ' fue retirada.'
     },
     ['fr'] = {
-        ['open_menu'] = '[E] - Ouvrir le menu',
+        ['open_menu'] = 'Ouvrir le menu - E',
         ['menu_title'] = 'LSPD Vérification de licence',
         ['menu_check'] = 'Vérifier la licence',
         ['menu_add'] = 'Ajouter une licence',
@@ -145,7 +148,7 @@ Translation = {
         ['rev_li1'] = 'Vous avez reçu la licence ',
         ['pur_li'] = 'Achat de ',
         ['lic'] = ' licence',
-        ['rec_inv'] = 'Recevoir la facture',
+        ['pay_liz'] = 'Licence achetée',
         ['pur_1'] = 'Vous avez acheté une ',
         ['pur_2'] = ' licence pour ',
         ['money'] = '€',

@@ -11,30 +11,56 @@ end
 
 local markers = getMarkersFromConfig()
 
+local playerJob = nil
+
+Citizen.CreateThread(function()
+    while true do
+        ESX.TriggerServerCallback('sc_lc:getJob', function(job)
+            playerJob = job
+        end)
+        Citizen.Wait(5000)
+    end
+end)
+
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        local playerPed = PlayerPedId()
-        local playerCoords = GetEntityCoords(playerPed)
+        if playerJob == 'police' then
+            local playerPed = PlayerPedId()
+            local playerCoords = GetEntityCoords(playerPed)
 
-        for _, marker in ipairs(markers) do
-            local distance = GetDistanceBetweenCoords(playerCoords, marker.x, marker.y, marker.z, true)
+            for _, marker in ipairs(markers) do
+                local distance = GetDistanceBetweenCoords(playerCoords, marker.x, marker.y, marker.z, true)
 
-            if distance < 5.0 then
-                DrawMarker(1, marker.x, marker.y, marker.z - 1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.5, 36, 144, 218, 0.8, false, true, 2, nil, nil, false)
+                if distance < 5.0 then
+                    DrawMarker(1, marker.x, marker.y, marker.z - 1.0, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.5, 36, 144, 218, 0.8, false, true, 2, nil, nil, false)
 
-                if distance < 1.0 then
-                    ESX.ShowHelpNotification(Translation[Config.Locale]['open_menu'])
+                    if distance < 1.0 then
+                        lib.showTextUI(Translation[Config.Locale]['open_menu'], {
+                            position = 'right-center',
+                            style = {
+                                color = '#f5f5f5',
+                                backgroundColor = 'rgba(32, 32, 32, 0.85)',
+                                fontSize = '16px',
+                                padding = '12px 20px',
+                                borderRadius = '8px',
+                                border = 'none',
+                                boxShadow = '0px 8px 15px rgba(0, 0, 0, 0.3)'
+                            }
+                        })
 
-                    if IsControlJustPressed(0, 38) then
-                        TriggerServerEvent('sc_lc:checkJobAndOpenMenu')
+                        if IsControlJustPressed(0, 38) then
+                            lib.hideTextUI()
+                            TriggerServerEvent('sc_lc:checkJobAndOpenMenu')
+                        end
+                    else
+                        lib.hideTextUI()
                     end
                 end
             end
         end
     end
 end)
-
 
 RegisterNetEvent('sc_lc:open')
 AddEventHandler('sc_lc:open', function()
@@ -53,7 +79,7 @@ lib.registerContext({
     options = {
       {
         title = Translation[Config.Locale]['menu_check'],
-        icon = 'magnifying-glass',
+        icon = 'file-circle-question',
         iconColor = '#6fa8dc',
         onSelect = function()
           TriggerEvent('sc_lc:openDialog')
@@ -84,7 +110,7 @@ lib.registerContext({
 RegisterNetEvent('sc_lc:openDialog')
 AddEventHandler('sc_lc:openDialog', function()
     local input = lib.inputDialog(Translation[Config.Locale]['menu_check'], {
-        {type = 'number', label = Translation[Config.Locale]['dia_sub'], description = '', required = true},
+        {type = 'number', label = Translation[Config.Locale]['dia_sub'], icon = 'hashtag', description = '', required = true},
     })
 
     if not input then return end
@@ -92,7 +118,7 @@ AddEventHandler('sc_lc:openDialog', function()
 end)
 
 RegisterNetEvent('sc_lc:showLicenses')
-AddEventHandler('sc_lc:showLicenses', function(playerName, licenses)
+AddEventHandler('sc_lc:showLicenses', function(playerName, playerID, licenses)
     local licenseList = ""
     for i, license in ipairs(licenses) do
         if i > 1 then
@@ -102,24 +128,20 @@ AddEventHandler('sc_lc:showLicenses', function(playerName, licenses)
     end
 
     local alert = lib.alertDialog({
-        header = Translation[Config.Locale]['alert_header'] .. playerName,
+        header = Translation[Config.Locale]['alert_header'] .. " " .. playerName .. " [" .. playerID .. "]",
         content = licenseList,
         centered = true,
         cancel = false
     })
 end)
 
-RegisterNetEvent('sc_lm:sendTax')
-AddEventHandler('sc_lm:sendTax', function(source, type, amount)
-  TriggerServerEvent('esx_billing:sendBill', source, 'society_police', type, amount)
-end)
 
 --Add License
 
 RegisterNetEvent('sc_lc:openplus')
 AddEventHandler('sc_lc:openplus', function()
     local input = lib.inputDialog(Translation[Config.Locale]['dia_add'], {
-        {type = 'number', label = Translation[Config.Locale]['dia_sub'], required = true}
+        {type = 'number', label = Translation[Config.Locale]['dia_sub'], icon = 'hashtag', required = true}
     })
 
     if not input then return end
@@ -134,16 +156,21 @@ AddEventHandler('sc_lc:askPay', function(playerID, availableLicenses)
     end
 
     local input = lib.inputDialog(Translation[Config.Locale]['dia_add'], {
-        {type = 'number', label = Translation[Config.Locale]['dia_enter'], required = true},
-        {type = 'select', label = Translation[Config.Locale]['dia_license'], options = options, required = true}
+        {type = 'number', label = Translation[Config.Locale]['dia_enter'], icon = 'user', required = true},
+        {type = 'select', label = Translation[Config.Locale]['dia_license'], icon = 'id-card', options = options, required = true},
+        {type = 'select', label = 'Payment Method', icon = 'cash-register', options = {
+            {value = 'cash', label = 'Cash'},
+            {value = 'bank', label = 'Bank Account'}
+        }, required = true}
     })
 
     if not input then return end
 
     local price = tonumber(input[1])
     local selectedLicense = input[2]
+    local paymentMethod = input[3]
 
-    TriggerServerEvent('sc_lc:addlicense', playerID, selectedLicense, price)
+    TriggerServerEvent('sc_lc:addlicense', playerID, selectedLicense, price, paymentMethod)
 end)
 
 --Remove License
@@ -151,7 +178,7 @@ end)
 RegisterNetEvent('sc_lc:openminus')
 AddEventHandler('sc_lc:openminus', function()
     local input = lib.inputDialog(Translation[Config.Locale]['dia_rem'], {
-        {type = 'number', label = Translation[Config.Locale]['dia_sub'], required = true}
+        {type = 'number', label = Translation[Config.Locale]['dia_sub'], icon = 'hashtag', required = true}
     })
 
     if not input then return end
@@ -166,7 +193,7 @@ AddEventHandler('sc_lc:selectLicenseForRemoval', function(playerID, ownedLicense
     end
 
     local input = lib.inputDialog(Translation[Config.Locale]['dia_rem'], {
-        {type = 'select', label = Translation[Config.Locale]['dia_license'], options = options, required = true}
+        {type = 'select', label = Translation[Config.Locale]['dia_license'], icon = 'id-card', options = options, required = true}
     })
 
     if not input then return end

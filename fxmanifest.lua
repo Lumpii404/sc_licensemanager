@@ -5,7 +5,7 @@ lua54 'yes'
 name "sc_licensemanager"
 author "ScubeScripts"
 description ""
-version "1.0.2"
+version "1.0.3"
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
