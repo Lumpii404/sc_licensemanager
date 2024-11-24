@@ -9,7 +9,7 @@
 - DrawMarker is only visible for the 'police' job
 - Menu has been customized and new designs have been added
 
-## New Requirements
+## Requirements
 
 > [ESX-Legacy](https://github.com/esx-framework/esx-legacy)
 
