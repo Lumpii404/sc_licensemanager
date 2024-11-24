@@ -1,17 +1,19 @@
 # sc_licensemanager
 
-Today I would like to introduce you to my new script sc_licensemanager, with this script you can manage and check player licenses. 
+![](https://github.com/user-attachments/assets/a6eac0d6-3c62-43a1-9318-542dac63aa53)
 
-![Screenshot 2024-06-23 172610](https://github.com/ScubeScripts/sc_licensemanager/assets/104854776/ae0d3b71-0248-4e82-9134-2956f8adb516)
+## What's new?
 
+- The billing system has been removed from the code and now runs via an integrated billing system. (Users can select a billing type directly in the menu and the license is paid for directly)
+- [[pefcl](https://github.com/project-error/pefcl)] is no longer required 
+- DrawMarker is only visible for the 'police' job
+- Menu has been customized and new designs have been added
 
-## Requirements
+## New Requirements
 
 > [ESX-Legacy](https://github.com/esx-framework/esx-legacy)
 
 > [ox_lib](https://github.com/overextended/ox_lib)
-
-> [pefcl](https://github.com/project-error/pefcl)
 
 ## Installation
 Clone or download this repository
