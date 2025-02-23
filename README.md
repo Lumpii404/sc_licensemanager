@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This is an old version which is not up to date, please look here: [ScubeScripts](https://github.com/orgs/ScubeScripts/repositories)
+
 # sc_licensemanager
 
 ![](https://github.com/user-attachments/assets/a6eac0d6-3c62-43a1-9318-542dac63aa53)
